@@ -1,15 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
+    <title>Fetching JSON from URL</title>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
+    <div class="queryBox">
+      <p>URL</p>
+      <input type="text" class="queryTextBox" />
+      <button class="queryBtn" onclick="getQueryResults()">Query</button>
+    </div>
+    <div class="respBox">
+      
+      <div class="data" id="data">
+        <div>URL Response</div>
+        <textarea name="" id="databox" cols="30" rows="10"></textarea>
+      </div>
+      
+      <div class="data2">
+        <div>Processed URL Response</div>
+        <textarea name="" id="databox2" cols="30" rows="10"></textarea>
+      </div>
+    </div>
 
-    <link rel="stylesheet" type="text/css" href="index.css">
-    <title>Document</title>
-</head>
-<body>
-    <h1>This is Header 1</h1>
-    <p>This is paragraph.</p>
-    <a href="about.html"><button>Click Here</button></a>
-</body>
+    <script>
+      function getQueryResults() {
+        var query = document.querySelector(".queryTextBox").value;
+        var url = query;
+
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            // Process the retrieved JSON data
+            displayData(data);
+            displayData2(data); // Call the function to display data in databox2
+          })
+          .catch((error) => {
+            // Handle any errors
+            console.error("Error:", error);
+          });
+      }
+
+      function displayData(data) {
+        var dataDiv = document.getElementById("databox");
+        dataDiv.innerText = JSON.stringify(data);
+
+        // Count quantity of object items per nesting layer
+        var objectItemCount = countObjectItems(data);
+        console.log(
+          "Quantity of object items per nesting layer:",
+          objectItemCount
+        );
+      }
+
+      function countObjectItems(data) {
+        if (typeof data !== "object" || Array.isArray(data)) {
+          return 0;
+        }
+
+        let count = 0;
+        for (let key in data) {
+          if (data.hasOwnProperty(key)) {
+            count++;
+            count += countObjectItems(data[key]);
+          }
+        }
+        return count;
+      }
+
+      function countArrayElements(data) {
+        if (!Array.isArray(data)) {
+          return 0;
+        }
+
+        let count = 0;
+        for (let i = 0; i < data.length; i++) {
+          count++;
+          count += countArrayElements(data[i]);
+        }
+        return count;
+      }
+
+      function sortCharactersDescending(data) {
+        if (typeof data !== "object" || data === null) {
+          return data;
+        }
+
+        if (Array.isArray(data)) {
+          return data.map((item) => sortCharactersDescending(item));
+        }
+
+        if (typeof data === "object") {
+          let sortedData = {};
+          Object.keys(data)
+            .sort((a, b) => b.localeCompare(a))
+            .forEach((key) => {
+              sortedData[key] = sortCharactersDescending(data[key]);
+            });
+          return sortedData;
+        }
+
+        if (typeof data === "string") {
+          return data
+            .split("")
+            .sort((a, b) => b.localeCompare(a))
+            .join("");
+        }
+
+        return data;
+      }
+      function displayData2(data) {
+        var dataDiv2 = document.getElementById("databox2");
+        var objectItemCount = countObjectItems(data);
+        var displayText = JSON.stringify({
+          objectCount: objectItemCount,
+          ...data,
+        });
+
+        // Step 1: Use regular expressions to identify strings within double quotes
+        var regex = /"([^"\\]*(\\.[^"\\]*)*)"/g;
+        var sortedText = displayText.replace(regex, function (match) {
+          // Step 2: Split each string into an array of characters
+          var charArray = match.split("");
+
+          // Step 3: Sort the array in descending order
+          var sortedArray = charArray.sort((a, b) => b.localeCompare(a));
+
+          // Step 4: Join the sorted array back into a string
+          var descendingSequence = sortedArray.join("");
+
+          return descendingSequence;
+        });
+
+        dataDiv2.innerText = sortedText;
+
+        console.log("objectCount:", objectItemCount);
+
+        // Count quantity of array elements per nesting layer
+        var arrayElementCount = countArrayElements(data);
+        console.log(
+          "Quantity of array elements per nesting layer:",
+          arrayElementCount
+        );
+        // Sort characters of every value string in descending order
+        var sortedValues = sortCharactersDescending(Object.values(data));
+        console.log(
+          "Descending-sorted sequence of all characters of every value string:",
+          sortedValues
+        );
+      }
+      //   function displayData2(data) {
+      //     var dataDiv2 = document.getElementById("databox2");
+      //     dataDiv2.innerText = JSON.stringify(data);
+
+      //     // Count quantity of array elements per nesting layer
+      //     var arrayElementCount = countArrayElements(data);
+      //     console.log(
+      //       "Quantity of array elements per nesting layer:",
+      //       arrayElementCount
+      //     );
+      //   }
+    </script>
+  </body>
 </html>

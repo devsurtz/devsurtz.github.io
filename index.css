@@ -1,7 +1,41 @@
-body{
-    background-color: aqua;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
+
+@font-face {
+    font-family: "Cooper Black";
+    src: url("/fonts/cooper-black.otf");
 }
 
-h1{
-    color: red;
+* {
+    padding: 0;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
 }
+
+:root {
+    --textcolor: rgb(0, 0, 0);
+    --background: rgb(253, 159, 159);
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+}
+.queryBox{
+    padding-top: 10rem;
+}
+.queryBox, .respBox {
+    text-align: center;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.data, .data2 {
+    width: 300px;
+    height: 300px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
